@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F20D052A2AD9B67900C72B0C /* Origami Welcom Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = F20D05292AD9B67900C72B0C /* Origami Welcom Logo.png */; };
+		F232C9822ACF52E70011B45F /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F232C9812ACF52E70011B45F /* WelcomeViewController.swift */; };
 		F25542D92AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F25542D82AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel */; };
 		FA4750CA20BF3F48003E19ED /* Breakfast Finder Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = FA4750C920BF3F48003E19ED /* Breakfast Finder Logo.png */; };
 		FA68723920AA028000D82F25 /* ObjectDetector.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FA68723820AA028000D82F25 /* ObjectDetector.mlmodel */; };
@@ -22,6 +24,8 @@
 		7984D3D3A63BDFC4A07FEF8F /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		C2A2AB60C2A2AB2000000001 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E3CB966204CD821C6969C2A3 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		F20D05292AD9B67900C72B0C /* Origami Welcom Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Origami Welcom Logo.png"; sourceTree = SOURCE_ROOT; };
+		F232C9812ACF52E70011B45F /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		F25542D82AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = optimized_origami_resnet_v2.mlmodel; sourceTree = "<group>"; };
 		FA4750C920BF3F48003E19ED /* Breakfast Finder Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Breakfast Finder Logo.png"; sourceTree = SOURCE_ROOT; };
 		FA68723820AA028000D82F25 /* ObjectDetector.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = ObjectDetector.mlmodel; sourceTree = "<group>"; };
@@ -86,12 +90,14 @@
 			children = (
 				FAD5009E1ED668B60074D713 /* AppDelegate.swift */,
 				FAD500A01ED668B60074D713 /* ViewController.swift */,
+				F232C9812ACF52E70011B45F /* WelcomeViewController.swift */,
 				FAB417F52099308400494E9C /* VisionObjectRecognitionViewController.swift */,
 				F25542D82AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel */,
 				FAD500A21ED668B60074D713 /* Main.storyboard */,
 				FAD500A51ED668B60074D713 /* Assets.xcassets */,
 				FAD500A71ED668B60074D713 /* LaunchScreen.storyboard */,
 				FA68723820AA028000D82F25 /* ObjectDetector.mlmodel */,
+				F20D05292AD9B67900C72B0C /* Origami Welcom Logo.png */,
 				FA4750C920BF3F48003E19ED /* Breakfast Finder Logo.png */,
 				FAD500AA1ED668B60074D713 /* Info.plist */,
 			);
@@ -161,6 +167,7 @@
 				FA4750CA20BF3F48003E19ED /* Breakfast Finder Logo.png in Resources */,
 				FAD500A91ED668B60074D713 /* LaunchScreen.storyboard in Resources */,
 				FAD500A61ED668B60074D713 /* Assets.xcassets in Resources */,
+				F20D052A2AD9B67900C72B0C /* Origami Welcom Logo.png in Resources */,
 				FAD500A41ED668B60074D713 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,6 +182,7 @@
 				FAB417F62099308400494E9C /* VisionObjectRecognitionViewController.swift in Sources */,
 				FAD500A11ED668B60074D713 /* ViewController.swift in Sources */,
 				F25542D92AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel in Sources */,
+				F232C9822ACF52E70011B45F /* WelcomeViewController.swift in Sources */,
 				FAD5009F1ED668B60074D713 /* AppDelegate.swift in Sources */,
 				FA68723920AA028000D82F25 /* ObjectDetector.mlmodel in Sources */,
 			);
@@ -254,7 +262,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -310,7 +318,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
