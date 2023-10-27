@@ -1,19 +1,15 @@
 //
-//  WelcomeViewController.swift
+//  ModelSelectionViewController.swift
 //  OrigamiSensei
 //
-//  Created by James Chen on 10/5/23.
+//  Created by James Chen on 10/27/23.
 //  Copyright © 2023 Apple. All rights reserved.
 //
 
 import UIKit
 
-class WelcomeViewController: UIViewController {
-    @IBAction func startButton1Tapped(_ sender: UIButton) {
-        print("sender.tag", sender.tag)
-        performSegue(withIdentifier: "startCameraSegue", sender: self)
-    }
-    
+class ModelSelectionViewController: UIViewController {
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

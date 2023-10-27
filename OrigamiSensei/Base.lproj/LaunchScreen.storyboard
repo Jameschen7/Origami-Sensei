@@ -20,21 +20,31 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Origami Welcom Logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="7Ak-Ii-d02">
-                                <rect key="frame" x="0.0" y="91" width="375" height="485"/>
+                                <rect key="frame" x="0.0" y="16" width="810" height="1048"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="7Ak-Ii-d02" secondAttribute="height" multiplier="75:97" id="8xu-jm-Qe8"/>
                                 </constraints>
                             </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Origami Welcom Logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="gGV-hU-0qA">
-                                <rect key="frame" x="203" y="342" width="400" height="400"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="jFd-dO-Uoy">
+                                <rect key="frame" x="105" y="189.5" width="600" height="701"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Origami Welcom Logo" translatesAutoresizingMaskIntoConstraints="NO" id="gGV-hU-0qA">
+                                        <rect key="frame" x="0.0" y="0.0" width="600" height="701"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="600" id="iOG-Wt-tdC"/>
+                                            <constraint firstAttribute="height" constant="701" id="qmm-qM-3Ys"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="7Ak-Ii-d02" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="A49-XE-OiJ"/>
                             <constraint firstItem="7Ak-Ii-d02" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Ji7-6r-Kkb"/>
                             <constraint firstAttribute="trailing" secondItem="7Ak-Ii-d02" secondAttribute="trailing" id="V4E-A9-URb"/>
+                            <constraint firstItem="jFd-dO-Uoy" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="lk1-Lj-Mk6"/>
+                            <constraint firstItem="jFd-dO-Uoy" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="xif-J1-B4p"/>
                         </constraints>
                         <variation key="default">
                             <mask key="subviews">
@@ -50,10 +60,11 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="52" y="374.66266866566718"/>
+            <point key="canvasLocation" x="51.851851851851848" y="374.44444444444446"/>
         </scene>
     </scenes>
     <resources>
+        <image name="Origami Welcom Logo" width="1032" height="1032"/>
         <image name="Origami Welcom Logo.png" width="516" height="516"/>
     </resources>
 </document>

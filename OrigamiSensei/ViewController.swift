@@ -88,7 +88,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             let dimensions = CMVideoFormatDescriptionGetDimensions((videoDevice?.activeFormat.formatDescription)!)
             bufferSize.width = CGFloat(dimensions.width)
             bufferSize.height = CGFloat(dimensions.height)
-            //videoDevice!.activeVideoMinFrameDuration = CMTime(value: 1, timescale: 2) // set to 2FPS max
+            //videoDevice!.activeVideoMinFrameDuration = CMTime(value: 1, timescale: 2) // for video, set to 2FPS max
             videoDevice!.unlockForConfiguration()
         } catch {
             print(error)
