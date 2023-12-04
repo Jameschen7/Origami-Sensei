@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang=en style="overflow:hidden;">
+{# <html lang=en style="overflow:hidden;
+                     max-width: {{ width }}px; max-height: {{ height }}px; 
+                     width: {{ width }}px; height: {{ height }}px"> #}
+{# <html lang=en> #}
+<head>
+    <meta charset=utf-8>
+    <!-- set the width of the page for responsive design -->
+    {# <meta name="viewport" content="width={{ width }}, height={{ height }}, initial-scale=1">  <!-- 9:16 resolution--> #}
+    <meta name="viewport" content="width=device-width, initial-scale=1">  <!-- 9:16 resolution-->
+
+    <title>Origami Sensei Projection Website</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .blue-block {
+            position:fixed;
+            margin-top: 2%;
+            padding: 0.8%;
+            color: #000000;
+            background-color: #E2EEFF;
+            border: 2px solid #79AFFF;
+            border-radius: 10px;
+            overflow:hidden; 
+            background-clip: padding-box;
+        }
+    </style>
+
+    <script type="text/javascript">
+        window.onload = function() {
+            setTimeout( function(){ 
+                console.log("window.onload triggered");
+                const source = new EventSource("/param/stream");
+                source.onmessage = function(event) {
+                    console.log("NEW Param:", event.data);
+                    // Update UI here
+                    const img_element = document.getElementById("instruction-image"); 
+                    const param_array = event.data.split(";");
+                    for (let param of param_array) {
+                        let param_info = param.split(":");
+                        let param_name = param_info[0];
+                        let param_val = param_info[1];
+                        switch (param_name){
+                            case "x_coord":
+                                img_element.style.setProperty("left", param_val+"%");
+                                break;
+                            case "y_coord":
+                                img_element.style.setProperty("top", param_val+"%");
+                                break;
+                            case "stage":
+                                img_element.src = "static/dog_imgs/instructions/dog_instruction_Inst"+param_val+".png"
+                                break;
+                            case "scale":
+                                img_element.style.setProperty("transform", "scale("+param_val+")");
+                                break;
+                        }
+                    } 
+                };
+            }, 1000); // execute after 1s 
+        };
+    </script>
+</head>
+
+
+{# <body style="border: medium solid green ; width: {{ width }}px; height: {{ height }}px;  #}
+<body>
+    <p class="blue-block" style="left:25vw; width: 50vw; text-align:center">
+    Current Stats: stage={{ stage }}, scale={{ scale }}, x_coord={{ x_coord }}, y_coord={{ y_coord }} 
+    </p>
+    <img id="instruction-image" src="static/dog_imgs/instructions/dog_instruction_Inst{{ stage }}.png" alt="instruction image"
+         style="position: absolute; 
+                top: {{ y_coord }}%; 
+                left: {{ x_coord }}%; 
+                transform: scale({{ scale }});
+                -ms-transform: scale({{ scale }});
+                -webkit-transform: scale({{ scale }});
+                ">
+    <div class="blue-block" style="left: 2vw; width: 15vw; height: 25vh">
+        <p>test</p>
+    </div>
+    <div class="blue-block" style="right: 2vw; width: 15vw; height: 25vh">
+        <p>test 2</p>
+    </div>
+</body>
