@@ -17,17 +17,34 @@
             margin: 0;
             padding: 0;
         }
+        html {
+            height: 100%;
+        }
+        body {
+            min-height: 100%;
+        }
         
         .blue-block {
             position:fixed;
             margin-top: 2%;
             padding: 0.8%;
+
             color: #000000;
             background-color: #E2EEFF;
-            border: 2px solid #79AFFF;
+            border: 1px solid #79AFFF;
             border-radius: 10px;
             overflow:hidden; 
             background-clip: padding-box;
+
+            /* text */
+            font-family: "Verdana", sans-serif;
+        }
+
+        /* https://www.w3schools.com/css/css_align.asp */
+        .blue-block::after {
+            content: "";
+            clear: both;
+            display: table;
         }
     </style>
 
@@ -38,28 +55,49 @@
                 const source = new EventSource("/param/stream");
                 source.onmessage = function(event) {
                     console.log("NEW Param:", event.data);
-                    // Update UI here
+                    // Update image element
                     const img_element = document.getElementById("instruction-image"); 
                     const param_array = event.data.split(";");
+                    let para_dict = new Object();
+                    
                     for (let param of param_array) {
                         let param_info = param.split(":");
                         let param_name = param_info[0];
                         let param_val = param_info[1];
-                        switch (param_name){
+                        para_dict[param_name] = param_val
+                        /*switch (param_name){
                             case "x_coord":
-                                img_element.style.setProperty("left", param_val+"%");
+                                img_element.style.setProperty("left", param_val+"{{coord_unit}}");
                                 break;
                             case "y_coord":
-                                img_element.style.setProperty("top", param_val+"%");
+                                img_element.style.setProperty("top", param_val+"{{coord_unit}}");
                                 break;
                             case "stage":
-                                img_element.src = "static/dog_imgs/instructions/dog_instruction_Inst"+param_val+".png"
+                                if (param_val == "0") {
+                                    //img_element.style.visibility = "hidden";
+                                } else {
+                                    img_element.style.visibility = "visible";
+                                    img_element.src = "static/dog_imgs/instructions_scaled/dog_instruction_Inst"+param_val+".png"
+                                }
                                 break;
                             case "scale":
                                 img_element.style.setProperty("transform", "scale("+param_val+")");
                                 break;
-                        }
+                        } */
                     } 
+                    img_element.style.setProperty("left", para_dict["x_coord"]+"{{coord_unit}}");
+                    img_element.style.setProperty("top", para_dict["y_coord"]+"{{coord_unit}}");
+                    if (para_dict["stage"] == "0") {
+                        para_dict["stage"] = para_dict["valid_stage"];
+                    }
+                    img_element.src = "static/dog_imgs/instructions_scaled/dog_instruction_Inst"+para_dict["stage"]+".png";
+                    img_element.style.setProperty("transform", "scale("+para_dict["scale"]+")");
+
+                    // Update progress element
+                    const progess_text_element = document.getElementById("progress-text"); 
+                    progess_text_element.innerText = "Progress: "+para_dict["valid_stage"]+"/{{total_step_num}}";
+                    const progess_bar_element = document.getElementById("progress-bar"); 
+                    progess_bar_element.style.width = (parseInt(para_dict["valid_stage"])/parseInt("{{total_step_num}}")*100).toFixed() + "%";
                 };
             }, 1000); // execute after 1s 
         };
@@ -69,21 +107,48 @@
 
 {# <body style="border: medium solid green ; width: {{ width }}px; height: {{ height }}px;  #}
 <body>
-    <p class="blue-block" style="left:25vw; width: 50vw; text-align:center">
-    Current Stats: stage={{ stage }}, scale={{ scale }}, x_coord={{ x_coord }}, y_coord={{ y_coord }} 
-    </p>
-    <img id="instruction-image" src="static/dog_imgs/instructions/dog_instruction_Inst{{ stage }}.png" alt="instruction image"
+    <div class="blue-block" style="left:25vw; width:50vw; display:flex; align-items:center; border-radius:20px">
+        <p style="text-align:center; width:100%; font-weight: bold;">
+            Current Stats: stage={{ stage }}, scale={{ scale }}, x_coord={{ x_coord }}, y_coord={{ y_coord }} 
+        </p>
+    </div>
+    <img id="instruction-image" src="static/dog_imgs/instructions_scaled/dog_instruction_Inst{{ stage }}.png" alt="instruction image"
          style="position: absolute; 
-                top: {{ y_coord }}%; 
-                left: {{ x_coord }}%; 
+                top: {{ y_coord }}{{coord_unit}}; 
+                left: {{ x_coord }}{{coord_unit}}; 
                 transform: scale({{ scale }});
                 -ms-transform: scale({{ scale }});
                 -webkit-transform: scale({{ scale }});
                 ">
-    <div class="blue-block" style="left: 2vw; width: 15vw; height: 25vh">
-        <p>test</p>
+    <!-- Left block -->
+    <div class="blue-block" style="left: 2vw; width: 15vw; height: 30vh">
+        <p id="progress-text">Progress: {{valid_stage}}/{{total_step_num}}</p>
+        <div style="border-radius:8px; border: 2px solid black; height:1em; margin:0.3em 0;
+                                      padding: 0.1em"> 
+            <div id="progress-bar" style="background-color: black; border-radius:8px; 
+                                          width:100%; height:100%; margin-top:auto"></div>
+        </div>
+        <img src="{{ final_step_image_path }}" style="width:50%; margin:auto; margin-top:2ch; display:block">
     </div>
+    
+    <!-- Right block -->
     <div class="blue-block" style="right: 2vw; width: 15vw; height: 25vh">
         <p>test 2</p>
     </div>
+
+    {# <div class="blue-block" style="left: 2vw; top:50%; width: 15vw; height: 25vh">
+        <p>Debug current Stats: 
+        stage={{ stage }}, <br>
+        scale={{ scale }}, <br>
+        x_coord={{ x_coord }},  <br>
+        y_coord={{ y_coord }}  <br>
+        </p>
+    </div> #}
+
+    <div id="calibration-vertible-bar" 
+        style="position: fixed; left:50vw; height:100%; width:1vw; background-color: #00000020"></div>
+    {# <div id="calibration-square" 
+        style="position: fixed; height:300px; width:300px; background-color: #79AFFF;
+               left:{{ proj_half_width_mm*table_mm_2_proj_px_scale }}px; 
+               top:0px"></div> #}
 </body>
