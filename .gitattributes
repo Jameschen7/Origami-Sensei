@@ -1,1 +1,4 @@
-.ipynb linguist-documentation
+*.ipynb linguist-documentation
+*.jinja linguist-detectable=true
+*.swift linguist-detectable=true
+*.py linguist-detectable=true

@@ -4,3 +4,9 @@
 Repository for CMU MSCV Capstone project "Origami Sensei: Mixed Reality AI-Assistant for Creative Tasks Using Hands"
 
 <img src="imgs/instruction_demo.jpg" width="500px"/>
+
+
+## :hearts: Acknowledgement
+* Detection models trained using [Turi Create](https://github.com/apple/turicreate) framework
+* Pseudo-ground-truth bbox annotation using [GroundingDINO](https://github.com/IDEA-Research/GroundingDINO/tree/main)
+* Projection display UI font from [Inter](https://github.com/rsms/inter)

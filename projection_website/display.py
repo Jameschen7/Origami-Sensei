@@ -17,14 +17,9 @@ debug_message = lambda x: app.logger.debug(colored("-- "+str(x), "red"))
 # DEBUG = True
 NEW_PARAM_FLAG = False # update when new params are received
 lock = threading.Lock()
-# homography = np.array([[ 3.91385031e-01, -7.76022044e-02, -1.84052185e+01],
-#        [-1.63380904e-16,  4.11629084e-01, -5.39234100e+01],
-#        [-1.84209407e-18, -1.00095597e-03,  1.00000000e+00]]) # iPad 480x640 reso px to table mm with origin at middle of osmo
 homography = np.array([[ 4.04417623e-01, -1.00672980e-16, -9.70602294e+01],
        [-4.17131426e-17,  4.44550669e-01, -5.73470363e+01],
        [-2.35018606e-18, -9.56022945e-04,  1.00000000e+00]]) # iPad 480x640 reso px to table mm with origin at middle of osmo
-
-## display-related variables from the app
 GLOBAL_VARS = {
     "width":4096,
     "height":2304,
@@ -32,6 +27,8 @@ GLOBAL_VARS = {
     "proj_half_width_mm": 280,
     "table_mm_2_proj_px_scale":2.43,
 }
+
+## display-related variables from the app
 display_vars = {
     "stage":1,
     "scale":0.71,
@@ -53,7 +50,6 @@ display_vars_type = {
 @app.route("/")
 def main():
     return render_template('main.html.jinja', **display_vars, **GLOBAL_VARS, **dog_config)
-    # return render_template('main.html.jinja', stage=stage, scale=scale, x_coord=x_coord, y_coord=y_coord)
 #     return (\
 # f"""
 # <!doctype html>
@@ -62,10 +58,8 @@ def main():
 #     <meta charset=utf-8>
 #     <!-- set the width of the page for responsive design -->
 #     <meta name="viewport" content="width=device-width, initial-scale=1">
-
 #     <title>Origami Sensei Projection Website</title>
 # </head>
-
 
 # <body>
 #     <p>Current Stats: stage={stage}, scale={scale}, x_coord={x_coord}, y_coord={y_coord} </p>
@@ -122,7 +116,7 @@ def stream():
         if request.headers.get('accept') == 'text/event-stream':
             while True:
                 # data sending logic here
-                time.sleep(0.3) # check every 0.2 seconds
+                time.sleep(0.3) # check every 0.3 seconds
                 with lock:
                     if NEW_PARAM_FLAG:
                         NEW_PARAM_FLAG = False

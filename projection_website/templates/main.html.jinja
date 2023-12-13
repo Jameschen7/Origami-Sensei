@@ -1,9 +1,6 @@
 <!doctype html>
 <html lang=en style="overflow:hidden;">
-{# <html lang=en style="overflow:hidden;
-                     max-width: {{ width }}px; max-height: {{ height }}px; 
-                     width: {{ width }}px; height: {{ height }}px"> #}
-{# <html lang=en> #}
+
 <head>
     <meta charset=utf-8>
     <!-- set the width of the page for responsive design -->
@@ -12,22 +9,30 @@
 
     <title>Origami Sensei Projection Website</title>
 
+    <link rel="preconnect" href="static/fonts/">
+    <link rel="stylesheet" href="static/fonts/inter.css">
     <style>
         * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
         html {
-            height: 100%;
+            height: 100%; /* to enable percentage as unit */
+
+            /* text */
+            font-family: "Inter", "Verdana", sans-serif;
+            font-weight: 500
         }
         body {
             min-height: 100%;
         }
         
+        /* style for the top left, top middle, top right blacks */
         .blue-block {
             position:fixed;
             margin-top: 2%;
-            padding: 0.8%;
+            padding: 1.5% 2%;
 
             color: #000000;
             background-color: #E2EEFF;
@@ -35,12 +40,9 @@
             border-radius: 10px;
             overflow:hidden; 
             background-clip: padding-box;
-
-            /* text */
-            font-family: "Verdana", sans-serif;
         }
 
-        /* https://www.w3schools.com/css/css_align.asp */
+        /* in case use float: https://www.w3schools.com/css/css_align.asp */
         .blue-block::after {
             content: "";
             clear: both;
@@ -50,54 +52,66 @@
 
     <script type="text/javascript">
         window.onload = function() {
-            setTimeout( function(){ 
+            {% for key, value in instruction_texts.items() %}
+            localStorage.setItem("instruction_text_{{ key|trim|e }}", "{{ value|trim|e }}");
+            {% endfor %}
+            localStorage.setItem("curr_stage", "{{valid_stage}}"); // set the current valid stage stored on the client side
+
+            setTimeout( function() { 
                 console.log("window.onload triggered");
                 const source = new EventSource("/param/stream");
                 source.onmessage = function(event) {
                     console.log("NEW Param:", event.data);
-                    // Update image element
-                    const img_element = document.getElementById("instruction-image"); 
+                    const curr_stage = localStorage.getItem("curr_stage");
+
+                    // convert string into dict as obj
                     const param_array = event.data.split(";");
-                    let para_dict = new Object();
-                    
+                    const para_dict = new Object();
                     for (let param of param_array) {
                         let param_info = param.split(":");
                         let param_name = param_info[0];
                         let param_val = param_info[1];
-                        para_dict[param_name] = param_val
-                        /*switch (param_name){
-                            case "x_coord":
-                                img_element.style.setProperty("left", param_val+"{{coord_unit}}");
-                                break;
-                            case "y_coord":
-                                img_element.style.setProperty("top", param_val+"{{coord_unit}}");
-                                break;
-                            case "stage":
-                                if (param_val == "0") {
-                                    //img_element.style.visibility = "hidden";
-                                } else {
-                                    img_element.style.visibility = "visible";
-                                    img_element.src = "static/dog_imgs/instructions_scaled/dog_instruction_Inst"+param_val+".png"
-                                }
-                                break;
-                            case "scale":
-                                img_element.style.setProperty("transform", "scale("+param_val+")");
-                                break;
-                        } */
+                        para_dict[param_name] = param_val;
                     } 
+
+                    // Update image element
+                    const img_element = document.getElementById("instruction-image"); 
                     img_element.style.setProperty("left", para_dict["x_coord"]+"{{coord_unit}}");
                     img_element.style.setProperty("top", para_dict["y_coord"]+"{{coord_unit}}");
-                    if (para_dict["stage"] == "0") {
-                        para_dict["stage"] = para_dict["valid_stage"];
-                    }
-                    img_element.src = "static/dog_imgs/instructions_scaled/dog_instruction_Inst"+para_dict["stage"]+".png";
                     img_element.style.setProperty("transform", "scale("+para_dict["scale"]+")");
+                    /* if (para_dict["stage"] == "0") {
+                         img_element.style.visibility = "hidden";
+                    } */
+                    // img_element.style.visibility = "visible";
 
-                    // Update progress element
-                    const progess_text_element = document.getElementById("progress-text"); 
-                    progess_text_element.innerText = "Progress: "+para_dict["valid_stage"]+"/{{total_step_num}}";
-                    const progess_bar_element = document.getElementById("progress-bar"); 
-                    progess_bar_element.style.width = (parseInt(para_dict["valid_stage"])/parseInt("{{total_step_num}}")*100).toFixed() + "%";
+                    // only update if the stage changes
+                    if (curr_stage != para_dict["stage"]) {
+                        img_element.src = "static/dog_imgs/instructions_scaled/dog_instruction_Inst"+para_dict["valid_stage"]+".png";
+                        
+                        // Update the progress bar
+                        const progess_text_element = document.getElementById("progress-text"); 
+                        progess_text_element.innerText = "Progress: "+para_dict["valid_stage"]+"/{{total_step_num}}";
+                        const progess_bar_element = document.getElementById("progress-bar"); 
+                        progess_bar_element.style.width = (parseInt(para_dict["valid_stage"])/parseInt("{{total_step_num}}")*100).toFixed() + "%";
+    
+                        // Update the instruction gif
+                        const gif_element = document.getElementById("instruction-animation"); 
+                        if (para_dict["valid_stage"] != "{{total_step_num}}") {
+                            gif_element.src = "{{ instruction_gif_path_prefix }}"+para_dict["valid_stage"]+".gif";
+                        } else {
+                            gif_element.src = "{{ instruction_gif_path_prefix }}"+"7.gif";
+                        }
+
+                        // update the instruction text
+                        const inst_text_element = document.getElementById("instruction-text");
+                        const instruction_text = localStorage.getItem("instruction_text_"+para_dict["valid_stage"]);
+                        inst_text_element.innerText = instruction_text;
+
+                        localStorage.setItem("curr_stage", para_dict["valid_stage"]); // set the current valid stage stored on the client side
+                    } 
+                    /* else {
+                        console.log("Same stage, skipped!")
+                    } */
                 };
             }, 1000); // execute after 1s 
         };
@@ -107,37 +121,51 @@
 
 {# <body style="border: medium solid green ; width: {{ width }}px; height: {{ height }}px;  #}
 <body>
-    <div class="blue-block" style="left:25vw; width:50vw; display:flex; align-items:center; border-radius:20px">
-        <p style="text-align:center; width:100%; font-weight: bold;">
-            Current Stats: stage={{ stage }}, scale={{ scale }}, x_coord={{ x_coord }}, y_coord={{ y_coord }} 
-        </p>
-    </div>
+    <!-- Instruction image -->
     <img id="instruction-image" src="static/dog_imgs/instructions_scaled/dog_instruction_Inst{{ stage }}.png" alt="instruction image"
-         style="position: absolute; 
+         style="position: fixed; 
                 top: {{ y_coord }}{{coord_unit}}; 
                 left: {{ x_coord }}{{coord_unit}}; 
                 transform: scale({{ scale }});
-                -ms-transform: scale({{ scale }});
-                -webkit-transform: scale({{ scale }});
                 ">
-    <!-- Left block -->
-    <div class="blue-block" style="left: 2vw; width: 15vw; height: 30vh">
-        <p id="progress-text">Progress: {{valid_stage}}/{{total_step_num}}</p>
-        <div style="border-radius:8px; border: 2px solid black; height:1em; margin:0.3em 0;
-                                      padding: 0.1em"> 
-            <div id="progress-bar" style="background-color: black; border-radius:8px; 
-                                          width:100%; height:100%; margin-top:auto"></div>
+
+    <!-- middle instruction block -->
+    <div style="position: fixed; margin: 2% auto 0; left:25vw; width:50vw; display:flex; align-items:center;">
+        <div class="blue-block" style="border-radius:20px; position: static; margin:0 auto;">
+            <p id="instruction-text" style="text-align:center; margin:auto; font-weight:600; font-size: 1.2em">
+                {{instruction_texts[valid_stage]|trim}}
+            </p>
         </div>
-        <img src="{{ final_step_image_path }}" style="width:50%; margin:auto; margin-top:2ch; display:block">
+    </div>
+    {# <div class="blue-block" style="left:25vw; margin-left:auto; width:50vw; display:flex; align-items:center; border-radius:20px">
+        <p id="instruction-text" style="text-align:center; width:100%; font-weight: 600; font-size: 1.2em">
+            {{instruction_texts[valid_stage]|trim}}
+        </p>
+    </div> #}
+
+    <!-- Left block -->
+    <div class="blue-block" style="left: 2vw; width: 20vw; min-height: 20vw"> <!-- the horizontal layout is fixed, and extend in the vertical axis -->
+        <p id="progress-text" style="font-weight: 500;">Progress: {{valid_stage}}/{{total_step_num}}</p>
+        <div style="border-radius:7px; border: 2px solid black; height:1.3em; margin:0.5em 0; padding: 0.15em 0.15em 0.14em;
+                    display:flex; align-items:center"> 
+            <div id="progress-bar" style="background-color: black; border-radius:5px; 
+                                          width:{{valid_stage / total_step_num * 100}}%; height:100%;"></div>
+        </div>
+        <div style="display:flex; align-items:center">
+            <img src="{{ final_step_image_path }}" style="width:55%; margin:1.5ex auto 1ex; display:block">
+        </div>
     </div>
     
     <!-- Right block -->
-    <div class="blue-block" style="right: 2vw; width: 15vw; height: 25vh">
-        <p>test 2</p>
+    <div class="blue-block" style="right: 2vw; width: 20vw; min-height: 20vw; display:flex; align-items:center">
+        <img id="instruction-animation" src="{{ instruction_gif_path_prefix }}{{ valid_stage if valid_stage != total_step_num else total_step_num-1 }}.gif" 
+                style="width:80%; margin:auto; padding-bottom:3%; display:block">
     </div>
 
+
+    <!-- for debug only-->
     {# <div class="blue-block" style="left: 2vw; top:50%; width: 15vw; height: 25vh">
-        <p>Debug current Stats: 
+        <p>Debug only: 
         stage={{ stage }}, <br>
         scale={{ scale }}, <br>
         x_coord={{ x_coord }},  <br>
@@ -145,8 +173,10 @@
         </p>
     </div> #}
 
+
+    <!-- for calibration and set-up purpose only; can comment out afterwards-->
     <div id="calibration-vertible-bar" 
-        style="position: fixed; left:50vw; height:100%; width:1vw; background-color: #00000020"></div>
+        style="position: fixed; left:50vw; height:100%; width:1vw; background-color: #00000010"></div>
     {# <div id="calibration-square" 
         style="position: fixed; height:300px; width:300px; background-color: #79AFFF;
                left:{{ proj_half_width_mm*table_mm_2_proj_px_scale }}px; 
