@@ -18,6 +18,12 @@ class VisionObjectRecognitionViewController: ViewController {
     // Vision parts
     private var requests = [VNRequest]()
     
+    @IBAction func goBackAction(_ sender: Any) {
+//        self.navigationController?.popViewController(animated: true)
+        dismiss(animated: true, completion: nil)
+
+    }
+    
     @discardableResult
     func setupVision() -> NSError? {
         // Setup Vision parts
@@ -91,6 +97,7 @@ class VisionObjectRecognitionViewController: ViewController {
 //        self.updateLayerGeometry()
 //        CATransaction.commit()
         
+        // draw classification result
         guard let observations = results as? [VNClassificationObservation] else { fatalError("Model failed to process image") }
         guard let firstObservation = observations.first else {return}
         let secondObservation = observations[1]
@@ -170,6 +177,11 @@ class VisionObjectRecognitionViewController: ViewController {
     }
     
     func updateLayerGeometry() {
+        // early return if the session is already ended
+        if (!isSessionRunning) {
+            return
+        }
+        
         let bounds = rootLayer.bounds
         var scale: CGFloat
         
@@ -233,7 +245,7 @@ class VisionObjectRecognitionViewController: ViewController {
         textLayer.string = formattedString
         textLayer.bounds = CGRect(x: 0, y: 0, width: 200, height: 100) // the origin specifies the starting location of the masking rectange over the full text string
         print("root layer bound:", rootLayer.bounds, "FPS layer:", textLayer.bounds, textLayer.bounds.midX, textLayer.bounds.midY)
-        textLayer.position = CGPoint(x: 10+textLayer.bounds.midX, y: 50+textLayer.bounds.midY)
+        textLayer.position = CGPoint(x: 10+textLayer.bounds.midX, y: 25+textLayer.bounds.midY)
         textLayer.foregroundColor = CGColor(colorSpace: CGColorSpaceCreateDeviceRGB(), components: [0.0, 0.0, 0.0, 1.0])
         textLayer.contentsScale = 2.0 // retina rendering
         rootLayer.addSublayer(textLayer)

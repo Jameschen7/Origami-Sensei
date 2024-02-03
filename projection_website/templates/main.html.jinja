@@ -9,7 +9,7 @@
 
     <title>Origami Sensei Projection Website</title>
 
-    <link rel="preconnect" href="static/fonts/">
+    {# <link rel="preconnect" href="static/fonts/"> # only benefit future cross-origin HTTP request #}
     <link rel="stylesheet" href="static/fonts/inter.css">
     <style>
         * {
@@ -38,7 +38,7 @@
             background-color: #E2EEFF;
             border: 1px solid #79AFFF;
             border-radius: 10px;
-            overflow:hidden; 
+            overflow: hidden; 
             background-clip: padding-box;
         }
 
@@ -55,7 +55,8 @@
             {% for key, value in instruction_texts.items() %}
             localStorage.setItem("instruction_text_{{ key|trim|e }}", "{{ value|trim|e }}");
             {% endfor %}
-            localStorage.setItem("curr_stage", "{{valid_stage}}"); // set the current valid stage stored on the client side
+            localStorage.setItem("curr_stage", "{{valid_stage}}"); // store the current valid stage on the client side
+            localStorage.setItem("total_step_num", "{{total_step_num}}"); 
 
             setTimeout( function() { 
                 console.log("window.onload triggered");
@@ -85,21 +86,23 @@
                     // img_element.style.visibility = "visible";
 
                     // only update if the stage changes
-                    if (curr_stage != para_dict["stage"]) {
-                        img_element.src = "static/dog_imgs/instructions_scaled/dog_instruction_Inst"+para_dict["valid_stage"]+".png";
+                    if (curr_stage != para_dict["valid_stage"]) {
+                        img_element.src = "{{ instruction_img_path_prefix }}"+para_dict["valid_stage"]+".png";
                         
                         // Update the progress bar
+                        const total_step_num = localStorage.getItem("total_step_num");
                         const progess_text_element = document.getElementById("progress-text"); 
-                        progess_text_element.innerText = "Progress: "+para_dict["valid_stage"]+"/{{total_step_num}}";
+                        // progess_text_element.innerText = "Progress: "+para_dict["valid_stage"]+"/"+total_step_num;
+                        progess_text_element.innerText = `Progress: ${para_dict["valid_stage"]}/${total_step_num}`;
                         const progess_bar_element = document.getElementById("progress-bar"); 
-                        progess_bar_element.style.width = (parseInt(para_dict["valid_stage"])/parseInt("{{total_step_num}}")*100).toFixed() + "%";
+                        progess_bar_element.style.width = (parseInt(para_dict["valid_stage"])/parseInt(total_step_num)*100).toFixed() + "%";
     
                         // Update the instruction gif
                         const gif_element = document.getElementById("instruction-animation"); 
-                        if (para_dict["valid_stage"] != "{{total_step_num}}") {
+                        if (para_dict["valid_stage"] != total_step_num) {
                             gif_element.src = "{{ instruction_gif_path_prefix }}"+para_dict["valid_stage"]+".gif";
                         } else {
-                            gif_element.src = "{{ instruction_gif_path_prefix }}"+"7.gif";
+                            gif_element.src = "{{ instruction_gif_path_prefix }}"+toFixed( parseInt(total_step_num)-1 )+".gif";
                         }
 
                         // update the instruction text
@@ -107,13 +110,14 @@
                         const instruction_text = localStorage.getItem("instruction_text_"+para_dict["valid_stage"]);
                         inst_text_element.innerText = instruction_text;
 
+                        // update the current stage
                         localStorage.setItem("curr_stage", para_dict["valid_stage"]); // set the current valid stage stored on the client side
                     } 
                     /* else {
                         console.log("Same stage, skipped!")
                     } */
                 };
-            }, 1000); // execute after 1s 
+            }, 1000); // execute after 1s to ensure full loading
         };
     </script>
 </head>
@@ -122,14 +126,14 @@
 {# <body style="border: medium solid green ; width: {{ width }}px; height: {{ height }}px;  #}
 <body>
     <!-- Instruction image -->
-    <img id="instruction-image" src="static/dog_imgs/instructions_scaled/dog_instruction_Inst{{ stage }}.png" alt="instruction image"
+    <img id="instruction-image" src="{{ instruction_img_path_prefix }}{{ stage }}.png" alt="instruction image"
          style="position: fixed; 
                 top: {{ y_coord }}{{coord_unit}}; 
                 left: {{ x_coord }}{{coord_unit}}; 
                 transform: scale({{ scale }});
                 ">
 
-    <!-- middle instruction block -->
+    <!-- middle instruction block (wrapped by a div so that the blue boundary is bound by text length) -->
     <div style="position: fixed; margin: 2% auto 0; left:25vw; width:50vw; display:flex; align-items:center;">
         <div class="blue-block" style="border-radius:20px; position: static; margin:0 auto;">
             <p id="instruction-text" style="text-align:center; margin:auto; font-weight:600; font-size: 1.2em">
@@ -137,29 +141,31 @@
             </p>
         </div>
     </div>
-    {# <div class="blue-block" style="left:25vw; margin-left:auto; width:50vw; display:flex; align-items:center; border-radius:20px">
-        <p id="instruction-text" style="text-align:center; width:100%; font-weight: 600; font-size: 1.2em">
+    {# <div class="blue-block" style="border-radius:20px; position: fixed; margin:2% auto 0; left:25vw; width:50vw; display:flex; align-items:center">
+        <p id="instruction-text" style="text-align:center; margin:auto; font-weight:600; font-size: 1.2em">
             {{instruction_texts[valid_stage]|trim}}
         </p>
     </div> #}
+    
 
     <!-- Left block -->
     <div class="blue-block" style="left: 2vw; width: 20vw; min-height: 20vw"> <!-- the horizontal layout is fixed, and extend in the vertical axis -->
         <p id="progress-text" style="font-weight: 500;">Progress: {{valid_stage}}/{{total_step_num}}</p>
-        <div style="border-radius:7px; border: 2px solid black; height:1.3em; margin:0.5em 0; padding: 0.15em 0.15em 0.14em;
+        <div style="border-radius:7px; border: 2px solid #000000; height:1.3em; margin:0.5em 0 1em; padding: 0.15em 0.15em 0.14em;
                     display:flex; align-items:center"> 
             <div id="progress-bar" style="background-color: black; border-radius:5px; 
                                           width:{{valid_stage / total_step_num * 100}}%; height:100%;"></div>
         </div>
-        <div style="display:flex; align-items:center">
-            <img src="{{ final_step_image_path }}" style="width:55%; margin:1.5ex auto 1ex; display:block">
+        <!-- display the final shape -->
+        <div style="display:flex; align-items:center; height:10vw; width:100%">
+            <img src="{{ final_step_image_path }}" style="max-width:95%; max-height:100%; margin:0ex auto 0ex;">
         </div>
     </div>
     
     <!-- Right block -->
     <div class="blue-block" style="right: 2vw; width: 20vw; min-height: 20vw; display:flex; align-items:center">
         <img id="instruction-animation" src="{{ instruction_gif_path_prefix }}{{ valid_stage if valid_stage != total_step_num else total_step_num-1 }}.gif" 
-                style="width:80%; margin:auto; padding-bottom:3%; display:block">
+             style="width:85%; max-width:95%; margin:auto; padding-bottom:3%;">
     </div>
 
 
@@ -176,9 +182,15 @@
 
     <!-- for calibration and set-up purpose only; can comment out afterwards-->
     <div id="calibration-vertible-bar" 
-        style="position: fixed; left:50vw; height:100%; width:1vw; background-color: #00000010"></div>
+        style="position: fixed; left:49.5vw; height:100%; width:1vw; background-color: #00000020"></div>
     {# <div id="calibration-square" 
-        style="position: fixed; height:300px; width:300px; background-color: #79AFFF;
-               left:{{ proj_half_width_mm*table_mm_2_proj_px_scale }}px; 
-               top:0px"></div> #}
+        style="position: fixed; height:345px; width:345px; background-color: #000000;
+               left:50%; top:50%; transform: scale(1) translate(-50%, -50%);
+               "></div> #}
+
+    {# temp to be lower and more to the right, so scale issue? #}
+    {# <div id="calibration-square" 
+        style="position: fixed; height:100px; width:100px; background-color: #000000;
+               left:623px; top:286px;
+               "></div> #}
 </body>
