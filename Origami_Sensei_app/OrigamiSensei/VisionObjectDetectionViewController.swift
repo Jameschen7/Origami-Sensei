@@ -10,20 +10,39 @@ import AVFoundation
 import Vision
 
 class VisionObjectDetectionViewController: ViewController {
+    // projection website url
+    //    private let url_address = "http://172.26.73.110:5000/param"
+    //    private let url_address = "http://192.168.240.162:5000/param"
+    //    private let url_address = "http://192.168.139.162:5000/param"
+    private let url_address = "http://192.168.1.75:5000/param"
     
-    private var detectionOverlay: CALayer! = nil
+    // Const
     private let requestProcessMaxFPS: Double = 30.0 //5 // the input frame comes at max 30fps
     private var lastExecutionTimestamp: TimeInterval = 0.0 // for throttling
     private let DEBUG: Bool = false
+    private let oriModelMaxStepDict = ["Dog": 8, "Cat": 9, "Whale": 6]
+//
+    // local variable
+    private var currValidStage: String = "1"
+//    private var prevValidStage: String = "1" // used for
+//    private var currValidStage: String = "1"
+    var currentOriModel: String = "Dog" // cannot be private since need to be prepared in a segue in the source view
+//    private var predCenterXQueue: FixedSizeQueue = FixedSizeQueue(maxSize: 3)
+//    private var predCenterYQueue: FixedSizeQueue = FixedSizeQueue(maxSize: 3)
+//    private var predWidthQueue: FixedSizeQueue = FixedSizeQueue(maxSize: 3)
+//    private var predHeightXQueue: FixedSizeQueue = FixedSizeQueue(maxSize: 3)
     
     // Vision parts
     private var requests = [VNRequest]()
+    private var detectionOverlay: CALayer! = nil
+
     
-    // local variable
-    private var currValidStage: String = "1"
-    
+    // UI
+    @IBOutlet weak var pageTitle: UILabel!
     @IBOutlet weak var instructionImageView: UIImageView!
+    @IBOutlet weak var nextStepImageView: UIImageView!
     @IBOutlet weak var previewContrainerView: UIView!
+    @IBOutlet weak var progressBar: UIProgressView!
     @IBAction func goBackAction(_ sender: Any) {
 //        self.navigationController?.popViewController(animated: true)
         dismiss(animated: true, completion: nil)
@@ -31,18 +50,31 @@ class VisionObjectDetectionViewController: ViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        pageTitle.text = currentOriModel
         
+        // update origami model name on the website
+        performGetRequestForOriModelUpdate(oriModel: currentOriModel)
+                
         // set up the previewContrainerView
         previewLayer.removeFromSuperlayer()
         previewLayer.frame = previewContrainerView.bounds
         previewContrainerView.layer.addSublayer(previewLayer)
 //        print(previewLayer.superlayer)
         
-        // configure instructionImageView
+        // configure instructionImageView & nextStepImageView
         // Set the border width
         instructionImageView.layer.borderWidth = 2
         instructionImageView.layer.cornerRadius = 5 // Adjust the value as needed
         instructionImageView.clipsToBounds = true
+        nextStepImageView.layer.borderWidth = 1.5
+        nextStepImageView.layer.cornerRadius = 5 // Adjust the value as needed
+        nextStepImageView.clipsToBounds = true
+        
+        // configure progress bar
+//        progressBar.progressTintColor = UIColor.blue // Color of the progress bar
+//        progressBar.progressTintColor = UIColor(red: 5 / 255.0, green: 128 / 255.0, blue: 174 / 255.0, alpha: 1.0)
+        progressBar.trackTintColor = UIColor.lightGray // Background color
+        progressBar.transform = progressBar.transform.scaledBy(x: 1, y: 2.5) // Doubles the thickness
 
         // Set the border color
         instructionImageView.layer.borderColor = UIColor.black.cgColor
@@ -88,9 +120,22 @@ class VisionObjectDetectionViewController: ViewController {
 //            let visionModel = try VNCoreMLModel(for: MLModel(contentsOf: modelURL))
             let config = MLModelConfiguration()
             config.computeUnits = .all // Use any available compute unit, including GPUs and ANEs
+            
 //            let visionModel = try VNCoreMLModel(
 //                for: optimized_origami_resnet_v2(configuration: config).model)
-            let visionModel = try VNCoreMLModel(for: PaperDetector_10000(configuration: config).model)
+//            let visionModel = try VNCoreMLModel(for: PaperDetector_10000(configuration: config).model)
+            let visionModel: VNCoreMLModel
+            switch currentOriModel {
+                case "Dog":
+                    visionModel = try VNCoreMLModel(for: PaperDetector_dog_extra7000(configuration: config).model)
+                case "Cat":
+                    visionModel = try VNCoreMLModel(for: PaperDetector_cat_extra7000(configuration: config).model)
+                case "Whale":
+                    visionModel = try VNCoreMLModel(for: PaperDetector_whale_extra7000(configuration: config).model)
+                default:
+                    print("-X '\(currentOriModel)' model not recognized.")
+                    return error
+            }
             
             let objectRecognition = VNCoreMLRequest(model: visionModel, completionHandler: { (request, error) in
                 DispatchQueue.main.async(execute: {
@@ -102,7 +147,7 @@ class VisionObjectDetectionViewController: ViewController {
             })
             self.requests = [objectRecognition]
         } catch let error as NSError {
-            print("Model loading went wrong: \(error)")
+            print("-X '\(currentOriModel)' Model loading went wrong: \(error)")
         }
         
         return error
@@ -156,8 +201,8 @@ class VisionObjectDetectionViewController: ViewController {
             shapeLayer.addSublayer(textLayer)
             detectionOverlay.addSublayer(shapeLayer)
             
-            // update projected instruction, for the prediction in the buffer space, swap x and y back
-            performGetRequest(stage: topLabelObservation.identifier,
+            // update projected instruction; for the prediction in the buffer space, swap x and y back
+            performGetRequestForPrediction(stage: topLabelObservation.identifier,
                               xCoord: Float(objectBounds.origin.y),
                               yCoord: Float(objectBounds.origin.x))
             
@@ -165,7 +210,19 @@ class VisionObjectDetectionViewController: ViewController {
             if (currValidStage != topLabelObservation.identifier && topLabelObservation.identifier != "0") {
                 currValidStage = topLabelObservation.identifier
 //                instructionImageView.image = UIImage(contentsOfFile: Bundle.main.path(forResource: "OrigamiSensei/Dog_imgs/Dog_instruction_Inst"+currValidStage, ofType: "png")!)
-                instructionImageView.image = UIImage(named: "Dog_instruction_Inst"+currValidStage)
+                instructionImageView.image = UIImage(named: "\(currentOriModel)_instruction_Inst\(currValidStage)_blue")
+                
+                // find the next step and set progress bar
+                if var currValidStageForStage = Int(currValidStage) {
+                    currValidStageForStage += 1
+                    if currValidStageForStage > oriModelMaxStepDict[currentOriModel]! {
+                        currValidStageForStage -= 1
+                    }
+                    nextStepImageView.image = UIImage(named: "\(currentOriModel)_instruction_Step\(currValidStageForStage)_blue")
+                    progressBar.progress = Float(currValidStage)! / Float(oriModelMaxStepDict[currentOriModel]!)
+                } else {
+                    print("The `currValidStage` string '\(currValidStage)' cannot be converted to an integer.")
+                }
             }
             break // only process the first bbox
         }
@@ -186,6 +243,7 @@ class VisionObjectDetectionViewController: ViewController {
         }
         
         let exifOrientation = exifOrientationFromDeviceOrientation()
+        
         
 //        // save the raw camera image for debug/test
 //        let ciImage = CIImage(cvImageBuffer: pixelBuffer) // Convert CVImageBuffer to CIImage
@@ -210,6 +268,7 @@ class VisionObjectDetectionViewController: ViewController {
 //                print("Save failed")
 //            }
 //        }
+//        //////////////////
         
         
         let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: exifOrientation, options: [:])
@@ -261,7 +320,7 @@ class VisionObjectDetectionViewController: ViewController {
     func createTextSubLayerInBounds(_ bounds: CGRect, identifier: String, confidence: VNConfidence) -> CATextLayer {
         let textLayer = CATextLayer()
         textLayer.name = "Object Label"
-        let formattedString = NSMutableAttributedString(string: String(format: "\(identifier)  Confidence:  %.2f", confidence))
+        let formattedString = NSMutableAttributedString(string: String(format: "\(identifier)  Score:  %.2f", confidence))
         let largeFont = UIFont(name: "Helvetica", size: 24.0)!
         formattedString.addAttributes([NSAttributedString.Key.font: largeFont], range: NSRange(location: 0, length: identifier.count))
         textLayer.string = formattedString
@@ -303,22 +362,28 @@ class VisionObjectDetectionViewController: ViewController {
         rootLayer.addSublayer(textLayer)
     }
     
-    func performGetRequest(stage: String, xCoord: Float, yCoord: Float) {
-//        let url_address = "http://172.26.73.110:5000/param"
-//        let url_address = "http://192.168.240.162:5000/param"
-        let url_address = "http://192.168.139.162:5000/param"
     
+    // MARK: - HTTP Related
+    func performGetRequestForOriModelUpdate(oriModel: String) {
+        let urlParamString = "current_ori_model=\(oriModel)"
+        performGetRequest(urlParamString)
+    }
+    
+    func performGetRequestForPrediction(stage: String, xCoord: Float, yCoord: Float) {
         let xCoordStr = String(format: "%.4f", xCoord)
         let yCoordStr = String(format: "%.4f", yCoord)
-        guard let url = URL(string: "\(url_address)?stage=\(stage)&x_coord=\(xCoordStr)&y_coord=\(yCoordStr)")
+        let urlParamString = "stage=\(stage)&x_coord=\(xCoordStr)&y_coord=\(yCoordStr)"
+        performGetRequest(urlParamString)
+    }
+    
+    func performGetRequest(_ urlParam: String) {
+        guard let url = URL(string: "\(url_address)?\(urlParam)")
         else {
-            print("Invalid URL")
+            print("Invalid URL: \(url_address)?\(urlParam)")
             return
         }
-//        print("final url_address:\(url_address)?stage=\(stage)&x_coord=\(xCoordStr)&y_coord=\(yCoordStr)")
-
+        
         let session = URLSession.shared
-
         let task = session.dataTask(with: url) { data, response, error in
             if let error = error {
                 print("Error: \(error)")
@@ -340,3 +405,26 @@ class VisionObjectDetectionViewController: ViewController {
     }
 }
 
+
+
+struct FixedSizeQueue {
+    private var elements: [Float] = []
+    private let maxSize: Int
+
+    init(maxSize: Int) {
+        self.maxSize = maxSize
+    }
+
+    mutating func enqueue(_ element: Float) {
+        if elements.count == maxSize {
+            elements.removeFirst()
+        }
+        elements.append(element)
+    }
+
+    func mean() -> Float? {
+        guard !elements.isEmpty else { return nil }
+        let sum = elements.reduce(0, +)
+        return sum / Float(elements.count)
+    }
+}

@@ -8,12 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		F21DA1492AEBCED900D91C27 /* ModelSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21DA1482AEBCED900D91C27 /* ModelSelectionViewController.swift */; };
-		F22AD03F2B229CE0007447C6 /* PaperDetector_10000.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F22AD03E2B229CE0007447C6 /* PaperDetector_10000.mlmodel */; };
 		F232C9822ACF52E70011B45F /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F232C9812ACF52E70011B45F /* CategoryViewController.swift */; };
-		F25542D92AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F25542D82AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel */; };
+		F23D86E92BA77CD1007248BB /* optimized_origami_resnet_v2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F23D86E82BA77CD1007248BB /* optimized_origami_resnet_v2.mlmodel */; };
+		F23D86EB2BA77CF3007248BB /* PaperDetector_10000.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F23D86EA2BA77CF2007248BB /* PaperDetector_10000.mlmodel */; };
+		F2689E1A2B8542D100070E45 /* PaperDetector_dog_extra7000.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F2689E192B8542D100070E45 /* PaperDetector_dog_extra7000.mlmodel */; };
+		F2689E1C2B8542DE00070E45 /* PaperDetector_whale_extra7000.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F2689E1B2B8542DE00070E45 /* PaperDetector_whale_extra7000.mlmodel */; };
+		F2689E1E2B8542E900070E45 /* PaperDetector_cat_extra7000.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F2689E1D2B8542E900070E45 /* PaperDetector_cat_extra7000.mlmodel */; };
 		F2D5FF362B1A6579006DE8B4 /* VisionObjectDetectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D5FF352B1A6579006DE8B4 /* VisionObjectDetectionViewController.swift */; };
-		F2D5FF3B2B1A687F006DE8B4 /* PaperOneShotDetector.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F2D5FF3A2B1A687F006DE8B4 /* PaperOneShotDetector.mlmodel */; };
-		FA68723920AA028000D82F25 /* ObjectDetector.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = FA68723820AA028000D82F25 /* ObjectDetector.mlmodel */; };
 		FAB417F62099308400494E9C /* VisionObjectRecognitionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB417F52099308400494E9C /* VisionObjectRecognitionViewController.swift */; };
 		FAD5009F1ED668B60074D713 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD5009E1ED668B60074D713 /* AppDelegate.swift */; };
 		FAD500A11ED668B60074D713 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD500A01ED668B60074D713 /* ViewController.swift */; };
@@ -27,12 +28,13 @@
 		C2A2AB60C2A2AB2000000001 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E3CB966204CD821C6969C2A3 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		F21DA1482AEBCED900D91C27 /* ModelSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSelectionViewController.swift; sourceTree = "<group>"; wrapsLines = 1; };
-		F22AD03E2B229CE0007447C6 /* PaperDetector_10000.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PaperDetector_10000.mlmodel; sourceTree = "<group>"; };
 		F232C9812ACF52E70011B45F /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
-		F25542D82AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = optimized_origami_resnet_v2.mlmodel; sourceTree = "<group>"; };
+		F23D86E82BA77CD1007248BB /* optimized_origami_resnet_v2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = optimized_origami_resnet_v2.mlmodel; sourceTree = "<group>"; };
+		F23D86EA2BA77CF2007248BB /* PaperDetector_10000.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PaperDetector_10000.mlmodel; sourceTree = "<group>"; };
+		F2689E192B8542D100070E45 /* PaperDetector_dog_extra7000.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PaperDetector_dog_extra7000.mlmodel; sourceTree = "<group>"; };
+		F2689E1B2B8542DE00070E45 /* PaperDetector_whale_extra7000.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PaperDetector_whale_extra7000.mlmodel; sourceTree = "<group>"; };
+		F2689E1D2B8542E900070E45 /* PaperDetector_cat_extra7000.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PaperDetector_cat_extra7000.mlmodel; sourceTree = "<group>"; };
 		F2D5FF352B1A6579006DE8B4 /* VisionObjectDetectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisionObjectDetectionViewController.swift; path = OrigamiSensei/VisionObjectDetectionViewController.swift; sourceTree = SOURCE_ROOT; };
-		F2D5FF3A2B1A687F006DE8B4 /* PaperOneShotDetector.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PaperOneShotDetector.mlmodel; sourceTree = "<group>"; };
-		FA68723820AA028000D82F25 /* ObjectDetector.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = ObjectDetector.mlmodel; sourceTree = "<group>"; };
 		FAB417F52099308400494E9C /* VisionObjectRecognitionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisionObjectRecognitionViewController.swift; sourceTree = "<group>"; };
 		FAD5009B1ED668B60074D713 /* OrigamiSensei.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrigamiSensei.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAD5009E1ED668B60074D713 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -93,18 +95,19 @@
 			isa = PBXGroup;
 			children = (
 				F2D5FF352B1A6579006DE8B4 /* VisionObjectDetectionViewController.swift */,
-				FAD5009E1ED668B60074D713 /* AppDelegate.swift */,
 				FAD500A01ED668B60074D713 /* ViewController.swift */,
 				F232C9812ACF52E70011B45F /* CategoryViewController.swift */,
 				F21DA1482AEBCED900D91C27 /* ModelSelectionViewController.swift */,
 				FAB417F52099308400494E9C /* VisionObjectRecognitionViewController.swift */,
-				F25542D82AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel */,
+				FAD5009E1ED668B60074D713 /* AppDelegate.swift */,
 				FAD500A21ED668B60074D713 /* Main.storyboard */,
 				FAD500A51ED668B60074D713 /* Assets.xcassets */,
 				FAD500A71ED668B60074D713 /* LaunchScreen.storyboard */,
-				FA68723820AA028000D82F25 /* ObjectDetector.mlmodel */,
-				F2D5FF3A2B1A687F006DE8B4 /* PaperOneShotDetector.mlmodel */,
-				F22AD03E2B229CE0007447C6 /* PaperDetector_10000.mlmodel */,
+				F2689E192B8542D100070E45 /* PaperDetector_dog_extra7000.mlmodel */,
+				F2689E1B2B8542DE00070E45 /* PaperDetector_whale_extra7000.mlmodel */,
+				F2689E1D2B8542E900070E45 /* PaperDetector_cat_extra7000.mlmodel */,
+				F23D86E82BA77CD1007248BB /* optimized_origami_resnet_v2.mlmodel */,
+				F23D86EA2BA77CF2007248BB /* PaperDetector_10000.mlmodel */,
 				FAD500AA1ED668B60074D713 /* Info.plist */,
 			);
 			path = OrigamiSensei;
@@ -185,14 +188,15 @@
 			files = (
 				FAB417F62099308400494E9C /* VisionObjectRecognitionViewController.swift in Sources */,
 				F2D5FF362B1A6579006DE8B4 /* VisionObjectDetectionViewController.swift in Sources */,
+				F23D86EB2BA77CF3007248BB /* PaperDetector_10000.mlmodel in Sources */,
+				F23D86E92BA77CD1007248BB /* optimized_origami_resnet_v2.mlmodel in Sources */,
+				F2689E1E2B8542E900070E45 /* PaperDetector_cat_extra7000.mlmodel in Sources */,
 				F21DA1492AEBCED900D91C27 /* ModelSelectionViewController.swift in Sources */,
 				FAD500A11ED668B60074D713 /* ViewController.swift in Sources */,
-				F2D5FF3B2B1A687F006DE8B4 /* PaperOneShotDetector.mlmodel in Sources */,
-				F25542D92AAB9E180000A048 /* optimized_origami_resnet_v2.mlmodel in Sources */,
+				F2689E1A2B8542D100070E45 /* PaperDetector_dog_extra7000.mlmodel in Sources */,
 				F232C9822ACF52E70011B45F /* CategoryViewController.swift in Sources */,
 				FAD5009F1ED668B60074D713 /* AppDelegate.swift in Sources */,
-				FA68723920AA028000D82F25 /* ObjectDetector.mlmodel in Sources */,
-				F22AD03F2B229CE0007447C6 /* PaperDetector_10000.mlmodel in Sources */,
+				F2689E1C2B8542DE00070E45 /* PaperDetector_whale_extra7000.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

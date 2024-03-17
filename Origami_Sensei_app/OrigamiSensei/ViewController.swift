@@ -65,6 +65,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         
         session.beginConfiguration()
         session.sessionPreset = .vga640x480 // Model image size is smaller. Even though this is different from iPad front camera resolution & aspect ratio (720x1280), the aspect ratio of objects captured is the same, and the view is wider, which is better.
+//        session.sessionPreset = .hd1280x720 # this choice has narrower view (like cropped from the middle of 640x480)
         
         // Add video input to your session by adding the camera as a device
         guard session.canAddInput(deviceInput) else {
@@ -81,8 +82,27 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
              If processing or other operations cause delays and a new frame arrives before the previous one has been processed, the alwaysDiscardsLateVideoFrames property ensures that late frames are discarded to avoid processing lag or backlog.
              */
             videoDataOutput.alwaysDiscardsLateVideoFrames = true
+            
+            // set the pixel format
 //            videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)] // bi-planar, full-range YCbCr format -> most efficient
-            videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_24RGB)] // 24 bits using the RGB color model.
+//            videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_24RGB)] // 24 bits using the RGB color model.
+
+//            print(videoDataOutput.availableVideoPixelFormatTypes)
+//            print(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange, kCVPixelFormatType_32BGRA, kCVPixelFormatType_24RGB)
+            let availableTypes = videoDataOutput.availableVideoPixelFormatTypes
+            if availableTypes.contains(kCVPixelFormatType_24RGB) {
+                videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_24RGB]
+                print("- Preparse pixel format: kCVPixelFormatType_24RGB")
+            } else if availableTypes.contains(kCVPixelFormatType_32BGRA) {
+                videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+                print("- Preparse pixel format: kCVPixelFormatType_32BGRA")
+            } else if availableTypes.contains(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange) {
+                videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]
+                print("- Preparse pixel format: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange")
+            } else {
+                print("-X All desired pixel formats are not available")
+            }
+
             videoDataOutput.setSampleBufferDelegate(self, queue: videoDataOutputQueue)
         } else {
             print("Could not add video data output to the session")

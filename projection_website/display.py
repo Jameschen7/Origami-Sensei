@@ -23,42 +23,54 @@ GLOBAL_VARS = {
     # "height":2304,                    # try to set a fixed projection website height 
     "coord_unit":"px",                # unit used for x/y_coord in CSS
 
-    ## initial parameters for projector at 70cm high?
-    "proj_half_width_mm": 280,        # width of half of the projected website in mm
-    "table_mm_2_proj_px_scale":2.43,  # unit conversion from table mm to proj website px
-
-    # ## new parameters for projector at ~75cm high
+    # ## initial parameters for projector at 70cm high?
     # "proj_half_width_mm": 280,        # width of half of the projected website in mm
+    # "table_mm_2_proj_px_scale":2.43,  # unit conversion from table mm to proj website px
+
+    ## new parameters for projector at ~75cm high
+    "proj_half_width_mm": 281.5,        # width of half of the projected website in mm
+    "table_mm_2_proj_px_scale":2.3,  # unit conversion from table mm to proj website px: 300/131
+
+    # ## new parameters for projector at ~80cm high
+    # "proj_half_width_mm": 290,        # width of half of the projected website in mm
     # "table_mm_2_proj_px_scale":2.3,  # unit conversion from table mm to proj website px: 345/150
 }
 
 ## Global var
 new_param_flag = False  # update when new params are received
-current_ori_model = "dog"
-# current_ori_model = "cat"
+current_ori_model = "Dog"
+# current_ori_model = "Cat"
 ori_model_config = ori_model_name2config[current_ori_model]
 
 ## display-related variables from the app
 display_vars = {
     "stage":1,
+    "valid_stage":1, # stage excluding 0 (most recent non-zero stage)
 
-    ## initial parameters
+    # # # initial parameters
+    # "x_coord":500,
+    # "y_coord":100,
+    # "scale":0.71, # this scale number is to used to scale the instruction image to match the proj web px of a 15cm paper 
+    # # initial parameters
     # "x_coord":500,
     # "y_coord":100,
     # "scale":0.71, # this scale number is to used to scale the instruction image to match the proj web px of a 15cm paper 
 
-    # temp parameters for recording videos (also need to comment out conversion from cam to table)
-    "x_coord":-110,  # in table mm
-    "y_coord":40, # in table mm
-    # "scale":0.71 *1.3* 212.13 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0],
-    "scale":0.71 *1.35* 212.13 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0],
+    # # temp parameters for recording videos (also need to comment out conversion from cam to table)
+    # "x_coord":-110,  # in table mm
+    # "y_coord":40, # in table mm
+    # "scale":0.71 *1.35* 212.13 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0],
 
     # ## new parameters
     # "x_coord":-110 * GLOBAL_VARS["table_mm_2_proj_px_scale"],  # in table mm
     # "y_coord":40 * GLOBAL_VARS["table_mm_2_proj_px_scale"], # in table mm
     # "scale":np.sqrt(2)*150 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0],
 
-    "valid_stage":1, # stage excluding 0 (most recent non-zero stage)
+    ## new parameters 2
+    "x_coord":-110 * GLOBAL_VARS["table_mm_2_proj_px_scale"],  # initial default in table mm, doesn't matter that much
+    "y_coord":40 * GLOBAL_VARS["table_mm_2_proj_px_scale"],    # initial default in table mm, doesn't matter that much
+    # "scale": np.sqrt(2)*150 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0],
+    "scale": 1
 }
 display_vars_type = {
     "stage":int,
@@ -114,14 +126,24 @@ def main():
 
 @app.route("/param") # ?stage=2
 def set_param():
+    """
+    url to change variables in one request
+    """
     global new_param_flag
+    global current_ori_model
+    global ori_model_config
     with lock:
-        # update display_vars
         debug_message(request.args)
         new_param_flag = True
+        # update display_vars
         for key, val in request.args.items():
             if key in display_vars:
                 display_vars[key] = display_vars_type[key](val)
+            if key == "current_ori_model":
+                current_ori_model = val
+                ori_model_config = ori_model_name2config[current_ori_model]
+                debug_message(f"-- Switch to '{current_ori_model}' model at: '{ori_model_config['instruction_img_path_prefix']}'")
+                return EMPTY_RESPONSE # only have one param
             else:
                 debug_message(f"Invalid parameter received: {key}")
         if display_vars["stage"] != 0:
@@ -135,7 +157,8 @@ def set_param():
 @app.route('/param/stream')
 def stream():
     """
-    URL for web client to listen to Server-Sent Events (SSE)
+    URL for web client to listen to Server-Sent Events (SSE).
+    It will keep the connection open and send messages (events) with predefined time interval.
     """
     def event_stream():
         global new_param_flag
@@ -194,7 +217,7 @@ def coordinate_transform():
     # display_vars["scale"] *= 212.13 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0]
 
     # homography transformation to table mm space
-    # iPad_px_2_table_mm()
+    iPad_px_2_table_mm()
 
     # coordinate transformation to proj web px space
     table_mm_2_proj_web_px()
@@ -202,7 +225,7 @@ def coordinate_transform():
 def iPad_px_2_table_mm():
     x = display_vars["x_coord"]
     y = display_vars["y_coord"]
-    debug_message(f"Received x,y: {x}, {y}")
+    # debug_message(f"Received x,y: {x}, {y}")
     homo_coord = np.array([x, y, 1], dtype=np.float32)
     table_mm_coord = homography @ homo_coord
     table_mm_coord = table_mm_coord[:2] / table_mm_coord[2]
@@ -221,5 +244,5 @@ def table_mm_2_proj_web_px():
     display_vars["y_coord"] += -(1-display_vars["scale"])/2 * current_step_size[1] + current_step_offset[1]*display_vars["scale"]
     # display_vars["x_coord"] += -(1-display_vars["scale"])/2 * current_step_size[0]
     # display_vars["y_coord"] += -(1-display_vars["scale"])/2 * current_step_size[1]
-
+    debug_message(display_vars["scale"])
     debug_message(f'Final x,y in proj web px space: {display_vars["x_coord"]}, {display_vars["y_coord"]}')
