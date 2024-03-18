@@ -40,10 +40,13 @@ cat_config = {
     # },
     "instruction_texts":{
         1: "Fold the upper corner diagonally down to the bottom corner.",
-        2: "Fold one flap of the paper up along the dashed line.",
-        3: "Fold both edges outwards along the dashed line so that the hypotenuse overlaps with the vertical leg.",
-        4: "Flip the paper over.",
-        5: "Fold the top corner of the head backwards along the dash-dot line to reveal the ear.",
-        6: "Task completed!!  Congratulations!!"
+        2: "Fold the top left and top right corners down to the bottom corner along the dashed lines.",
+        3: "Fold the top corner down along the dashed line.",
+        4: "Flip the left and right flaps up to the side along the dashed lines.",
+        5: "Fold the first layer on the bottom up so that the corner reaches the bottom vertex of the triangle above.",
+        6: "Flip the paper over.",
+        7: "Fold the bottom corner up along the dashed line to roughly reach the center.",
+        8: "Fold the top vertex of this newly folded triangle down along the dashed line.",
+        9: "Task completed!!  Congratulations!!"
     }
 }

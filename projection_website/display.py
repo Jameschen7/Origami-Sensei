@@ -38,8 +38,9 @@ GLOBAL_VARS = {
 
 ## Global var
 new_param_flag = False  # update when new params are received
-current_ori_model = "Dog"
-# current_ori_model = "Cat"
+new_ori_model_flag = False  # update when changed to new origami model 
+# current_ori_model = "Dog"
+current_ori_model = "Cat"
 ori_model_config = ori_model_name2config[current_ori_model]
 
 ## display-related variables from the app
@@ -69,8 +70,9 @@ display_vars = {
     ## new parameters 2
     "x_coord":-110 * GLOBAL_VARS["table_mm_2_proj_px_scale"],  # initial default in table mm, doesn't matter that much
     "y_coord":40 * GLOBAL_VARS["table_mm_2_proj_px_scale"],    # initial default in table mm, doesn't matter that much
-    # "scale": np.sqrt(2)*150 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0],
-    "scale": 1
+    "scale": np.sqrt(2)*150 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0],
+
+    # "scale": 1
 }
 display_vars_type = {
     "stage":int,
@@ -130,19 +132,30 @@ def set_param():
     url to change variables in one request
     """
     global new_param_flag
+    global new_ori_model_flag
     global current_ori_model
     global ori_model_config
     with lock:
         debug_message(request.args)
+        # update variable
         new_param_flag = True
-        # update display_vars
         for key, val in request.args.items():
             if key in display_vars:
                 display_vars[key] = display_vars_type[key](val)
-            if key == "current_ori_model":
-                current_ori_model = val
-                ori_model_config = ori_model_name2config[current_ori_model]
-                debug_message(f"-- Switch to '{current_ori_model}' model at: '{ori_model_config['instruction_img_path_prefix']}'")
+            elif key == "current_ori_model":
+                if current_ori_model != val:
+                    # change ori model config
+                    new_ori_model_flag = True
+                    current_ori_model = val
+                    ori_model_config = ori_model_name2config[current_ori_model]
+                    debug_message(f"-- Switch to '{current_ori_model}' model at: '{ori_model_config['instruction_img_path_prefix']}'")
+                
+                # set back to default param
+                display_vars["stage"] = 1
+                display_vars["valid_stage"] = 1
+                display_vars["x_coord"] = -110 * GLOBAL_VARS["table_mm_2_proj_px_scale"]
+                display_vars["y_coord"] = 40 * GLOBAL_VARS["table_mm_2_proj_px_scale"]
+                display_vars["scale"] = np.sqrt(2)*150 * GLOBAL_VARS["table_mm_2_proj_px_scale"] / ori_model_config["instruction_image_size"][1][0]
                 return EMPTY_RESPONSE # only have one param
             else:
                 debug_message(f"Invalid parameter received: {key}")
@@ -162,11 +175,28 @@ def stream():
     """
     def event_stream():
         global new_param_flag
+        global new_ori_model_flag
+        ori_model_config_SSE_key_list = ["instruction_img_path_prefix", "instruction_gif_path_prefix",
+                                         "final_step_image_path", "total_step_num"] # plus instruction_texts
         if request.headers.get('accept') == 'text/event-stream':
             while True:
                 # data sending logic here
                 time.sleep(0.3) # check every 0.3 seconds, set empirically
                 with lock:  # acquire lock so that no update happens while sending current data
+                    if new_ori_model_flag:
+                        new_ori_model_flag = False
+                        message = "" # css style
+                        # add param
+                        for key in ori_model_config_SSE_key_list:
+                            val = ori_model_config[key]
+                            message += f"{key}:{val};"
+                        # add textual instruction
+                        for step_num, step_desc in ori_model_config["instruction_texts"].items():
+                            message += f"instruction_text_{step_num}:{step_desc};"
+                        message = message[:-1]
+                        debug_message(f"Server-Sent Events (SSE) to update ori model: {message}")
+                        yield f"data: {message}\n\n" # stream data format
+
                     if new_param_flag:
                         new_param_flag = False # so that the same param won't be updated again
                         message = "" # css style

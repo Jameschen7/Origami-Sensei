@@ -52,11 +52,15 @@
 
     <script type="text/javascript">
         window.onload = function() {
+            // initial param
+            localStorage.setItem("curr_stage", "{{valid_stage}}"); // store the current valid stage on the client side
+            // param related to origami model 
             {% for key, value in instruction_texts.items() %}
             localStorage.setItem("instruction_text_{{ key|trim|e }}", "{{ value|trim|e }}");
             {% endfor %}
-            localStorage.setItem("curr_stage", "{{valid_stage}}"); // store the current valid stage on the client side
             localStorage.setItem("total_step_num", "{{total_step_num}}"); 
+            localStorage.setItem("instruction_img_path_prefix", "{{instruction_img_path_prefix}}"); 
+            localStorage.setItem("instruction_gif_path_prefix", "{{instruction_gif_path_prefix}}"); 
 
             setTimeout( function() { 
                 console.log("window.onload triggered");
@@ -75,47 +79,64 @@
                         para_dict[param_name] = param_val;
                     } 
 
-                    // Update image element
-                    const img_element = document.getElementById("instruction-image"); 
-                    img_element.style.setProperty("left", para_dict["x_coord"]+"{{coord_unit}}");
-                    img_element.style.setProperty("top", para_dict["y_coord"]+"{{coord_unit}}");
-                    img_element.style.setProperty("transform", "scale("+para_dict["scale"]+")");
-                    /* if (para_dict["stage"] == "0") {
-                         img_element.style.visibility = "hidden";
-                    } */
-                    // img_element.style.visibility = "visible";
-
-                    // only update if the stage changes
-                    if (curr_stage != para_dict["valid_stage"]) {
-                        img_element.src = "{{ instruction_img_path_prefix }}"+para_dict["valid_stage"]+".png";
+                    // update origami model
+                    if ("final_step_image_path" in para_dict) {
+                        Object.entries(para_dict).forEach(([key, value]) => { // get (string key, value) pairs
+                            localStorage.setItem(key, value);
+                        });
+                        localStorage.setItem("curr_stage", "-1"); // so that the front end will re-render img & gif
                         
-                        // Update the progress bar
-                        const total_step_num = localStorage.getItem("total_step_num");
-                        const progess_text_element = document.getElementById("progress-text"); 
-                        // progess_text_element.innerText = "Progress: "+para_dict["valid_stage"]+"/"+total_step_num;
-                        progess_text_element.innerText = `Progress: ${para_dict["valid_stage"]}/${total_step_num}`;
-                        const progess_bar_element = document.getElementById("progress-bar"); 
-                        progess_bar_element.style.width = (parseInt(para_dict["valid_stage"])/parseInt(total_step_num)*100).toFixed() + "%";
-    
-                        // Update the instruction gif
-                        const gif_element = document.getElementById("instruction-animation"); 
-                        if (para_dict["valid_stage"] != total_step_num) {
-                            gif_element.src = "{{ instruction_gif_path_prefix }}"+para_dict["valid_stage"]+".gif";
-                        } else {
-                            gif_element.src = "{{ instruction_gif_path_prefix }}"+toFixed( parseInt(total_step_num)-1 )+".gif";
-                        }
+                        // change final step image
+                        const final_img_element = document.getElementById("final-step-image"); 
+                        final_img_element.src = localStorage.getItem("final_step_image_path");
+                        console.log("Switch to new origami model, with final_step_image_path:"+final_img_element.src);
+                    }
 
-                        // update the instruction text
-                        const inst_text_element = document.getElementById("instruction-text");
-                        const instruction_text = localStorage.getItem("instruction_text_"+para_dict["valid_stage"]);
-                        inst_text_element.innerText = instruction_text;
+                    // parameter update from the app
+                    if (("x_coord" in para_dict) && ("y_coord" in para_dict)) {
+                        // Update image element
+                        const img_element = document.getElementById("instruction-image"); 
+                        img_element.style.setProperty("left", para_dict["x_coord"]+"{{coord_unit}}");
+                        img_element.style.setProperty("top", para_dict["y_coord"]+"{{coord_unit}}");
+                        img_element.style.setProperty("transform", "scale("+para_dict["scale"]+")");
+                        /* if (para_dict["stage"] == "0") {
+                            img_element.style.visibility = "hidden";
+                        } */
+                        // img_element.style.visibility = "visible";
 
-                        // update the current stage
-                        localStorage.setItem("curr_stage", para_dict["valid_stage"]); // set the current valid stage stored on the client side
-                    } 
-                    /* else {
-                        console.log("Same stage, skipped!")
-                    } */
+
+                        // only update if the stage changes
+                        if (("valid_stage" in para_dict) && (curr_stage != para_dict["valid_stage"])) {
+                            img_element.src = localStorage.getItem("instruction_img_path_prefix") + para_dict["valid_stage"]+".png";
+                            // Update the progress bar
+                            const total_step_num = localStorage.getItem("total_step_num");
+                            const progess_text_element = document.getElementById("progress-text"); 
+                            // progess_text_element.innerText = "Progress: "+para_dict["valid_stage"]+"/"+total_step_num;
+                            progess_text_element.innerText = `Progress: ${para_dict["valid_stage"]}/${total_step_num}`;
+                            const progess_bar_element = document.getElementById("progress-bar"); 
+                            progess_bar_element.style.width = (parseInt(para_dict["valid_stage"])/parseInt(total_step_num)*100).toFixed() + "%";
+        
+                            // Update the instruction gif
+                            const gif_element = document.getElementById("instruction-animation"); 
+                            if (para_dict["valid_stage"] != total_step_num) {
+                                gif_element.src = localStorage.getItem("instruction_gif_path_prefix")+para_dict["valid_stage"]+".gif";
+                            } else {
+                                gif_element.src = localStorage.getItem("instruction_gif_path_prefix")+toFixed( parseInt(total_step_num)-1 )+".gif";
+                            }
+
+                            // update the instruction text
+                            const inst_text_element = document.getElementById("instruction-text");
+                            const instruction_text = localStorage.getItem("instruction_text_"+para_dict["valid_stage"]);
+                            inst_text_element.innerText = instruction_text;
+
+                            // update the current stage
+                            localStorage.setItem("curr_stage", para_dict["valid_stage"]); // set the current valid stage stored on the client side
+                        } 
+                        /* else {
+                            console.log("Same stage, skipped!")
+                        } */
+                    }
+
                 };
             }, 1000); // execute after 1s to ensure full loading
         };
@@ -125,7 +146,7 @@
 
 {# <body style="border: medium solid green ; width: {{ width }}px; height: {{ height }}px;  #}
 <body>
-    <!-- Instruction image -->
+    <!-- Instruction image in the middle -->
     <img id="instruction-image" src="{{ instruction_img_path_prefix }}{{ stage }}.png" alt="instruction image"
          style="position: fixed; 
                 top: {{ y_coord }}{{coord_unit}}; 
@@ -158,7 +179,7 @@
         </div>
         <!-- display the final shape -->
         <div style="display:flex; align-items:center; height:10vw; width:100%">
-            <img src="{{ final_step_image_path }}" style="max-width:95%; max-height:100%; margin:0ex auto 0ex;">
+            <img id="final-step-image" src="{{ final_step_image_path }}" style="max-width:95%; max-height:100%; margin:0ex auto 0ex;">
         </div>
     </div>
     
