@@ -18,16 +18,16 @@ dog_config = {
         7: (323,320),
         8: (250,321)
     },
-    # "instruction_image_arrow_offset":{ # for top-left corner position adjustment
-    #     1: (0,0),
-    #     2: (0,0),
-    #     3: (0,0),
-    #     4: (-8,-167),
-    #     5: (-2,-41),
-    #     6: (0,0),
-    #     7: (-36,0),
-    #     8: (0,0)
-    # },
+    "instruction_image_arrow_offset":{ # for top-left corner position adjustment
+        1: (0,0),
+        2: (0,0),
+        3: (0,0),
+        4: (-8,-167),
+        5: (-2,-41),
+        6: (0,0),
+        7: (-36,0),
+        8: (0,0)
+    },
     "instruction_texts":{
         1: "Fold the upper corner diagonally down to the bottom corner.",
         2: "Fold one flap of the paper up along the dashed line.",
@@ -39,14 +39,14 @@ dog_config = {
         8: "Task completed!!  Congratulations!!"
     },
 
-    "instruction_image_arrow_offset":{ # temporary for video recording
-        1: (0,0),
-        2: (0,340),
-        3: (0,340),
-        4: (-10,180),
-        5: (210,300),
-        6: (210,250),
-        7: (180,250),
-        8: (200,250),
-    },
+    # "instruction_image_arrow_offset":{ # temporary for video recording
+    #     1: (0,0),
+    #     2: (0,340),
+    #     3: (0,340),
+    #     4: (-10,180),
+    #     5: (210,300),
+    #     6: (210,250),
+    #     7: (180,250),
+    #     8: (200,250),
+    # },
 }

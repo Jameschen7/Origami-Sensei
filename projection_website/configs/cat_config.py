@@ -24,8 +24,11 @@ cat_config = {
         2: (0,0),
         3: (0,0),
         4: (0,0),
-        5: (0,-77),
+        5: (0,0),
         6: (0,0),
+        7: (0,0),
+        8: (0,0),
+        9: (0,0),
     },
     # "instruction_image_arrow_offset":{ # temporary for video recording
     #     1: (0,0),

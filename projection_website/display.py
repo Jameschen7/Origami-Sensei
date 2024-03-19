@@ -269,10 +269,8 @@ def table_mm_2_proj_web_px():
     current_step_offset = ori_model_config["instruction_image_arrow_offset"][ curr_stage ]
     display_vars["x_coord"] = (display_vars["x_coord"] + GLOBAL_VARS["proj_half_width_mm"]) * GLOBAL_VARS["table_mm_2_proj_px_scale"]
     display_vars["y_coord"] = display_vars["y_coord"] * GLOBAL_VARS["table_mm_2_proj_px_scale"]
-    debug_message(f'Final x,y in proj web px space: {display_vars["x_coord"]}, {display_vars["y_coord"]}')
+    debug_message(f'Transformed x,y in proj web px space: {display_vars["x_coord"]}, {display_vars["y_coord"]}')
     display_vars["x_coord"] += -(1-display_vars["scale"])/2 * current_step_size[0] + current_step_offset[0]*display_vars["scale"]
     display_vars["y_coord"] += -(1-display_vars["scale"])/2 * current_step_size[1] + current_step_offset[1]*display_vars["scale"]
-    # display_vars["x_coord"] += -(1-display_vars["scale"])/2 * current_step_size[0]
-    # display_vars["y_coord"] += -(1-display_vars["scale"])/2 * current_step_size[1]
-    debug_message(display_vars["scale"])
-    debug_message(f'Final x,y in proj web px space: {display_vars["x_coord"]}, {display_vars["y_coord"]}')
+    debug_message(f"Scale:{display_vars['scale']:.4f}, height:{current_step_size[1]}, height_offset:{current_step_offset[1]}")
+    debug_message(f'Final adjusted x,y in proj web px space: {display_vars["x_coord"]}, {display_vars["y_coord"]}')
